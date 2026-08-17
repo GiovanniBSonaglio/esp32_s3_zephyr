@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
+#include <zephyr/kernel.h>
 
 int main(int argc, char *argv[])
 {
-    return 0;    
+    printk("\nesp32-drivers: boot ok\n");
+    return 0;
 }

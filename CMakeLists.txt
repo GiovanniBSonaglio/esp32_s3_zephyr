@@ -1,7 +1,6 @@
-cmake_minimum_required(VERSION 3.15)
-project(ESP32_S3_ZEPHYR VERSION 1.0.0 LANGUAGES C)
+cmake_minimum_required(VERSION 3.20.0)
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
+find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
+project(esp32_drivers)
 
-add_executable(esp32_s3_zephyr src/main.c)
+target_sources(app PRIVATE src/main.c)
