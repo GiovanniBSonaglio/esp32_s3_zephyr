@@ -1,0 +1,110 @@
+{
+    // ESP32-S3 (Zephyr) debug configurations.
+    //
+    // Requires the "C/C++" extension (ms-vscode.cpptools) for the cppdbg debugger.
+    //
+    // Before debugging:
+    //   1. Build:  west build -b esp32s3_devkitc/esp32s3/procpu
+    //   2. Flash:  west flash          (so the on-chip image matches the ELF symbols)
+    //   3. Connect the DevKitC's "USB" port (built-in USB Serial/JTAG, not "UART").
+    //
+    // The "Debug" config starts OpenOCD for you. The "Attach" config connects to an
+    // OpenOCD/gdb server you started yourself (e.g. `west debugserver`).
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "ESP32-S3: Debug (OpenOCD + GDB)",
+            "type": "cppdbg",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/build/zephyr/zephyr.elf",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/home/gb106450/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/bin/xtensa-espressif_esp32s3_zephyr-elf-gdb",
+            "miDebuggerServerAddress": "localhost:3333",
+            "debugServerPath": "/home/gb106450/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/openocd",
+            "debugServerArgs": "-s /home/gb106450/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/share/openocd/scripts -f ${workspaceFolder}/.vscode/esp32s3_openocd.cfg",
+            "serverStarted": "Listening on port 3333 for gdb connections",
+            "filterStderr": true,
+            "stopAtConnect": true,
+            "setupCommands": [
+                {
+                    "description": "ESP32-S3 has only 2 hardware watchpoints",
+                    "text": "set remote hardware-watchpoint-limit 2",
+                    "ignoreFailures": false
+                },
+                {
+                    "description": "Enable gdb pretty-printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "postRemoteConnectCommands": [
+                {
+                    "description": "Reset the SoC and halt the CPU",
+                    "text": "monitor reset halt",
+                    "ignoreFailures": false
+                },
+                {
+                    "description": "Refresh gdb's register cache after reset",
+                    "text": "maintenance flush register-cache",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Let OpenOCD place flash breakpoints (app at offset 0)",
+                    "text": "monitor esp appimage_offset 0",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Break once at main; press Continue to run to it",
+                    "text": "thb main",
+                    "ignoreFailures": true
+                }
+            ],
+            "logging": {
+                "moduleLoad": false,
+                "engineLogging": false,
+                "trace": false
+            }
+        },
+        {
+            "name": "ESP32-S3: Attach (OpenOCD already running)",
+            "type": "cppdbg",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/build/zephyr/zephyr.elf",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/home/gb106450/zephyr-sdk-1.0.1/gnu/xtensa-espressif_esp32s3_zephyr-elf/bin/xtensa-espressif_esp32s3_zephyr-elf-gdb",
+            "miDebuggerServerAddress": "localhost:3333",
+            "stopAtConnect": true,
+            "setupCommands": [
+                {
+                    "description": "ESP32-S3 has only 2 hardware watchpoints",
+                    "text": "set remote hardware-watchpoint-limit 2",
+                    "ignoreFailures": false
+                },
+                {
+                    "description": "Enable gdb pretty-printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "postRemoteConnectCommands": [
+                {
+                    "description": "Halt the CPU without resetting",
+                    "text": "monitor halt",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Refresh gdb's register cache",
+                    "text": "maintenance flush register-cache",
+                    "ignoreFailures": true
+                }
+            ],
+            "logging": {
+                "moduleLoad": false,
+                "engineLogging": false,
+                "trace": false
+            }
+        }
+    ]
+}
