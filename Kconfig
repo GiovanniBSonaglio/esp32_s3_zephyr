@@ -1,0 +1,7 @@
+source "Kconfig.zephyr"
+
+rsource "drivers/uart/Kconfig"
+
+menu "App Settings"
+
+endmenu

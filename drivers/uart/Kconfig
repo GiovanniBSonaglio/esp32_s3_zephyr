@@ -1,0 +1,15 @@
+menu "UART Driver Settings"
+
+config UART_RX_BUFFER_SZ
+        int "UART Rx Ring Buffer Size"
+        default 256
+        help
+          Size in bytes for UART Rx Ring Buffer.
+
+config UART_TX_BUFFER_SZ
+        int "UART Tx Ring Buffer Size"
+        default 256
+        help
+          Size in bytes for UART Tx Ring Buffer.
+
+endmenu
