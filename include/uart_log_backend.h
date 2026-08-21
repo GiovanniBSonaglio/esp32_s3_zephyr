@@ -1,0 +1,4 @@
+#ifndef UART_LOG_BACKEND_H
+#define UART_LOG_BACKEND_H
+
+#endif // UART_LOG_BACKEND_H

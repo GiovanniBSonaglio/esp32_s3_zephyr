@@ -10,7 +10,7 @@ LOG_MODULE_REGISTER(esp32_uart_driver, LOG_LEVEL_WRN);
 
 K_SEM_DEFINE(uart_tx_sem, 0, 1);
 RING_BUF_DECLARE(uart_tx_ringbuf, CONFIG_UART_TX_BUFFER_SZ);
-K_MUTEX_DEFINE(uart_tx_mut);
+static struct k_spinlock lock;
 
 K_SEM_DEFINE(uart_rx_sem, 0, 1);
 RING_BUF_DECLARE(uart_rx_ringbuf, CONFIG_UART_RX_BUFFER_SZ);
@@ -75,22 +75,19 @@ int uart_get_byte(unsigned char *buf, k_timeout_t timeout) {
     return (ring_buf_get(&uart_rx_ringbuf, buf, 1) == 1) ? 0 : -EAGAIN;
 }
 
-int uart_write_str(const char *s, k_timeout_t timeout)
-{
-    int ret = 0;
-    size_t len = strlen(s);
+int uart_write(const uint8_t *data, size_t len, k_timeout_t timeout) {
     size_t offset = 0;
 
-    k_mutex_lock(&uart_tx_mut, K_FOREVER);
     while (offset < len) {
+        k_spinlock_key_t key = k_spin_lock(&lock);
         offset += ring_buf_put(&uart_tx_ringbuf,
-                    (const uint8_t *)&s[offset], len - offset);
+                    (const uint8_t *)&data[offset], len - offset);
+        k_spin_unlock(&lock, key);
+        
         uart_irq_tx_enable(uart_dev);
-        if (k_sem_take(&uart_tx_sem, timeout) != 0) {  /* wait for this chunk to drain */
-            ret = -EAGAIN;
+        if (k_sem_take(&uart_tx_sem, timeout) != 0) {
             break;
         }
     }
-    k_mutex_unlock(&uart_tx_mut);
-    return ret;
+    return (int)offset;
 }
