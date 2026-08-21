@@ -83,11 +83,18 @@ int uart_write(const uint8_t *data, size_t len, k_timeout_t timeout) {
         offset += ring_buf_put(&uart_tx_ringbuf,
                     (const uint8_t *)&data[offset], len - offset);
         k_spin_unlock(&lock, key);
-        
+
         uart_irq_tx_enable(uart_dev);
         if (k_sem_take(&uart_tx_sem, timeout) != 0) {
             break;
         }
     }
     return (int)offset;
+}
+
+// Synchronous Tx for panic cases (no IRQ needed)
+void uart_write_sync(const uint8_t *data, size_t len) {
+    for (size_t i = 0; i < len; i++) {
+        uart_poll_out(uart_dev, data[i]);
+    }
 }

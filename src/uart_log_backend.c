@@ -7,7 +7,14 @@
 
 static uint8_t log_buf[256];
 
-static int out_cb_fn(uint8_t *data, size_t length, void *ctx) {
+static volatile bool panic_mode;
+
+static int out_cb_fn(uint8_t *data, size_t length, void *ctx)
+{
+    if (panic_mode) {
+        uart_write_sync(data, length);
+        return length;
+    }
     return uart_write(data, length, K_FOREVER);
 }
 
@@ -18,6 +25,7 @@ static void process_log_cb(const struct log_backend *const backend, union log_ms
 }
 
 static void panic_log_cb(const struct log_backend *const backend) {
+    panic_mode = true;
     log_backend_std_panic(&log_output_inst);
 }
 
