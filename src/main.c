@@ -15,6 +15,5 @@ int main(void)
         return -1;
     }
     LOG_INF("esp32-drivers: Boot ok");
-
     return 0;
 }
