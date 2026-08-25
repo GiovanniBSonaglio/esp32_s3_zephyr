@@ -1,4 +1,5 @@
 #include <string.h>
+#include <errno.h>
 
 #include <zephyr/ztest.h>
 #include <zephyr/kernel.h>
@@ -15,6 +16,7 @@ static void uart_before(void *fixture)
     uart_emul_flush_tx_data(emul_dev);
     zassert_equal(init_uart(emul_dev), 0, "Error initializing UART");
 }
+
 ZTEST_SUITE(uart_unit_test, NULL, NULL, uart_before, NULL, NULL);
 
 /**
@@ -25,14 +27,15 @@ ZTEST_SUITE(uart_unit_test, NULL, NULL, uart_before, NULL, NULL);
  */
 ZTEST(uart_unit_test, test_uart_tx)
 {
-	uint8_t buf[4];
-	uint8_t *data = &buf[0];
-	int data_len;
+	const uint8_t msg[] = {'t', 'e', 's', 't'};
+    uint8_t buf[4];
 
-	uart_write("test", 4, K_FOREVER);
-	data_len = uart_emul_get_tx_data(emul_dev, data, 4);
-	zassert_equal(data_len, 4, "Incorrect written data length");
-	zassert_mem_equal(data, "test", 4);
+    int written = uart_write(msg, sizeof(msg), K_FOREVER);
+    zassert_equal(written, (int)sizeof(msg), "uart_write returned %d", written);
+
+    int got = uart_emul_get_tx_data(emul_dev, buf, sizeof(buf));
+    zassert_equal(got, (int)sizeof(msg), "captured %d bytes", got);
+    zassert_mem_equal(buf, msg, sizeof(msg));
 }
 
 /**
@@ -43,13 +46,13 @@ ZTEST(uart_unit_test, test_uart_tx)
  */
 ZTEST(uart_unit_test, test_uart_rx)
 {
-	char test_str[] = "test";
-	uint8_t buf;
+	const uint8_t msg[] = {'t', 'e', 's', 't'};
+	uint8_t ch;
 
-	uart_emul_put_rx_data(emul_dev, "test", 4);
+	uart_emul_put_rx_data(emul_dev, msg, sizeof(msg));
 	
-	for(uint8_t i = 0; i < strlen(test_str); i++) {
-		uart_get_byte(&buf, K_FOREVER);
-		zassert_equal(buf, test_str[i], "Character in pos %d does not match", i);
+	for(int i = 0; i < (int)sizeof(msg); i++) {
+		uart_get_byte(&ch, K_FOREVER);
+		zassert_equal(ch, msg[i], "Character in pos %d does not match", i);
 	}
 }

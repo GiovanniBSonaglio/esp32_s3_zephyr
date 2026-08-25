@@ -1,0 +1,25 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  twister:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: app
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Zephyr
+        uses: zephyrproject-rtos/action-zephyr-setup@v1
+        with:
+          app-path: app
+          toolchains: arm-zephyr-eabi
+
+      - name: Run Twister
+        working-directory: app
+        run: west twister -T tests/uart -p native_sim --inline-logs

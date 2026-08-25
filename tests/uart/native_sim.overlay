@@ -1,5 +1,8 @@
 / {
     uart_test: uart_test {
         compatible = "zephyr,uart-emul";
+        /* To test payloads larger than the drivers 256 ring bufs */
+        tx-fifo-size = <1024>;
+        rx-fifo-size = <1024>;
     };
 };
