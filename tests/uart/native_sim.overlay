@@ -1,0 +1,5 @@
+/ {
+    uart_test: uart_test {
+        compatible = "zephyr,uart-emul";
+    };
+};

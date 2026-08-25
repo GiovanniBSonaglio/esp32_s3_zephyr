@@ -1,0 +1,7 @@
+source "Kconfig.zephyr"
+
+rsource "../../drivers/uart/Kconfig"
+
+menu "Test Uart Settings"
+
+endmenu
