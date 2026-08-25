@@ -5,3 +5,59 @@ rsource "drivers/uart/Kconfig"
 menu "App Settings"
 
 endmenu
+
+menu "USBD options"
+	depends on USB_DEVICE_STACK_NEXT
+
+config USBD_MANUFACTURER
+	string "USB device manufacturer string"
+	default "Zephyr Project"
+	help
+	  USB device manufacturer string.
+
+config USBD_PRODUCT
+	string "USB device product string"
+	default "USBD"
+	help
+	  USB device product stringa.
+
+config USBD_VID
+	hex "USB device Vendor ID"
+	default 0x2fe3
+	help
+	  USB device Vendor ID. The default id (0x2fe3) is associated to
+	  Zephyr Project, you must use your own VID fors and applications
+	  outside of Zephyr Project.
+
+config USBD_PID
+	hex "USB device Product ID"
+	default 0x0001
+	help
+	  USB device Product ID. You must use your own PID fors
+	  and applications outside of Zephyr Project.
+
+config USBD_SELF_POWERED
+	bool "USB device Self-powered attribute"
+	default y
+	help
+	  Set the Self-powered attribute in the configuration.
+
+config USBD_REMOTE_WAKEUP
+	bool "USB device Remote Wakeup attribute"
+	help
+	  Set the Remote Wakeup attribute in the configuration.
+
+config USBD_MAX_POWER
+	int "USB device bMaxPower value"
+	default 125
+	range 0 250
+	help
+	  bMaxPower value in the configuration in 2 mA units.
+
+config USBD_20_EXTENSION_DESC
+	bool "Use default USB 2.0 Extension Descriptor"
+	depends on USBD_BOS_SUPPORT
+	help
+	  Set bcdUSB value to 0201 and use default USB 2.0 Extension Descriptor.
+
+endmenu
