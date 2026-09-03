@@ -5,6 +5,7 @@ project(esp32_drivers)
 
 include_directories(include)
 include_directories(drivers/uart)
+include_directories(drivers/servo)
 
 FILE(GLOB app_sources src/*.c)
-target_sources(app PRIVATE ${app_sources} drivers/uart/uart.c)
+target_sources(app PRIVATE ${app_sources} drivers/uart/uart.c drivers/servo/servo.c)
