@@ -15,7 +15,7 @@ static int out_cb_fn(uint8_t *data, size_t length, void *ctx)
         uart_write_sync(data, length);
         return length;
     }
-    return uart_write(data, length, K_FOREVER);
+    return uart_write(data, length, K_MSEC(100));
 }
 
 LOG_OUTPUT_DEFINE(log_output_inst, out_cb_fn, log_buf, sizeof(log_buf));

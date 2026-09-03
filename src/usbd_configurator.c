@@ -52,8 +52,6 @@ USBD_CONFIGURATION_DEFINE(sample_hs_config,
 			  CONFIG_USBD_MAX_POWER, &hs_cfg_desc);
 /* doc configuration instantiation end */
 
-K_SEM_DEFINE(dtr_sem, 0, 1);
-
 static inline void print_baudrate(const struct device *dev)
 {
 	uint32_t baudrate;
@@ -89,9 +87,7 @@ static void test_msg_cb(struct usbd_context *const ctx, const struct usbd_msg *m
 		uint32_t dtr = 0U;
 
 		uart_line_ctrl_get(msg->dev, UART_LINE_CTRL_DTR, &dtr);
-		if (dtr) {
-			k_sem_give(&dtr_sem);
-		}
+		LOG_DBG("Control line state: dtr=%u", dtr);
 	}
 
 	if (msg->type == USBD_MSG_CDC_ACM_LINE_CODING) {
@@ -128,19 +124,19 @@ static struct usbd_context *usbd_setup_device(usbd_msg_cb_t msg_cb)
 	/* doc add string descriptor start */
 	err = usbd_add_descriptor(&usbd_ctx, &sample_lang);
 	if (err) {
-		LOG_ERR("Failed to initialize language descriptor (%d)", err);
+		LOG_ERR("Failed to initialize language descriptor (errno=%d)", err);
 		return NULL;
 	}
 
 	err = usbd_add_descriptor(&usbd_ctx, &manufecturer);
 	if (err) {
-		LOG_ERR("Failed to initialize manufacturer descriptor (%d)", err);
+		LOG_ERR("Failed to initialize manufacturer descriptor (errno=%d)", err);
 		return NULL;
 	}
 
 	err = usbd_add_descriptor(&usbd_ctx, &product_d);
 	if (err) {
-		LOG_ERR("Failed to initialize product descriptor (%d)", err);
+		LOG_ERR("Failed to initialize product descriptor (errno=%d)", err);
 		return NULL;
 	}
 
@@ -148,7 +144,7 @@ static struct usbd_context *usbd_setup_device(usbd_msg_cb_t msg_cb)
 		err = usbd_add_descriptor(&usbd_ctx, &sample_sn);
 	))
 	if (err) {
-		LOG_ERR("Failed to initialize SN descriptor (%d)", err);
+		LOG_ERR("Failed to initialize SN descriptor (errno=%d)", err);
 		return NULL;
 	}
 	/* doc add string descriptor end */
@@ -227,7 +223,7 @@ static struct usbd_context *usbd_init_device(usbd_msg_cb_t msg_cb)
 	/* doc device init start */
 	err = usbd_init(&usbd_ctx);
 	if (err) {
-		LOG_ERR("Failed to initialize device support");
+		LOG_ERR("Failed to initialize device support (errno=%d)", err);
 		return NULL;
 	}
 
@@ -246,14 +242,10 @@ int init_cdc_acm(struct usbd_context *usbd_ctx) {
 	if (!usbd_can_detect_vbus(usbd_ctx)) {
 		err = usbd_enable(usbd_ctx);
 		if (err) {
-			LOG_ERR("Failed to enable device support");
+			LOG_ERR("Failed to enable device support (errno=%d)", err);
 			return err;
 		}
 	}
-
-	LOG_INF("Wait for DTR");
-	k_sem_take(&dtr_sem, K_FOREVER);
-	LOG_INF("DTR set");
 
 	LOG_INF("USB device support enabled");
 
