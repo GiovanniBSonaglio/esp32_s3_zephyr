@@ -1,0 +1,9 @@
+menu "Stepper Driver Settings"
+
+config STEPPER_FULL_STEPS_PER_REV
+        int "Stepper Full steps per Revolution"
+        default 200
+        help
+          Number of steps per revolution for the stepper.
+
+endmenu

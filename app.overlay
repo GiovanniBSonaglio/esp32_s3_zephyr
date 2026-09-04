@@ -12,6 +12,27 @@
         min-pulse = <PWM_USEC(500)>;
         max-pulse = <PWM_USEC(2400)>;
     };
+
+    aliases {
+		stepper-driver = &tmc2209;
+		stepper-ctrl = &step_dir_motion_control;
+	};
+
+	tmc2209: stepper-driver {
+		compatible = "adi,tmc2209";
+		en-gpios = <&gpio0 3 GPIO_ACTIVE_HIGH>;
+		m0-gpios = <&gpio0 6 GPIO_ACTIVE_HIGH>;
+		m1-gpios = <&gpio0 7 GPIO_ACTIVE_HIGH>;
+		micro-step-res = <32>;
+	};
+
+	step_dir_motion_control: motion-controller {
+		compatible = "zephyr,gpio-step-dir-stepper-ctrl";
+		step-gpios = <&gpio0 8 GPIO_ACTIVE_HIGH>;
+		dir-gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
+		invert-direction;
+		stepper-driver = <&tmc2209>;
+	};
 };
 
 &pinctrl {
