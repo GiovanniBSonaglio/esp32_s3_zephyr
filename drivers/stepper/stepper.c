@@ -5,7 +5,7 @@
 
 #include "stepper.h"
 
-LOG_MODULE_REGISTER(stepper_generic, LOG_LEVEL_WRN);
+LOG_MODULE_REGISTER(stepper_drv, LOG_LEVEL_WRN);
 
 static const struct device *stepper_driver = DEVICE_DT_GET(DT_ALIAS(stepper_driver));
 static const struct device *stepper_ctrl = DEVICE_DT_GET(DT_ALIAS(stepper_ctrl));
@@ -20,7 +20,6 @@ static float microstep_remainder;
 int init_stepper(){
     int ret = 0;
 
-    LOG_INF("Starting generic stepper sample");
 	if (!device_is_ready(stepper_ctrl)) {
 		LOG_ERR("Device %s is not ready", stepper_ctrl->name);
 		return -ENODEV;

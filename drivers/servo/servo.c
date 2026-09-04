@@ -5,7 +5,7 @@
 
 #include "servo.h"
 
-LOG_MODULE_REGISTER(esp32_servo_driver, LOG_LEVEL_WRN);
+LOG_MODULE_REGISTER(servo_drv, LOG_LEVEL_WRN);
 
 static const struct pwm_dt_spec servo = PWM_DT_SPEC_GET(DT_NODELABEL(servo));
 static const uint32_t min_pulse = DT_PROP(DT_NODELABEL(servo), min_pulse);

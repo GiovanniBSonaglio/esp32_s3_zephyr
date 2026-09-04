@@ -6,7 +6,7 @@
 
 #include "uart.h"
 
-LOG_MODULE_REGISTER(esp32_uart_driver, LOG_LEVEL_WRN);
+LOG_MODULE_REGISTER(uart_drv, LOG_LEVEL_WRN);
 
 K_SEM_DEFINE(uart_tx_sem, 0, 1);
 RING_BUF_DECLARE(uart_tx_ringbuf, CONFIG_UART_TX_BUFFER_SZ);

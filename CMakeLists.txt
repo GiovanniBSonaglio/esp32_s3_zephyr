@@ -7,6 +7,7 @@ include_directories(include)
 include_directories(drivers/uart)
 include_directories(drivers/servo)
 include_directories(drivers/stepper)
+include_directories(drivers/rtc)
 
 FILE(GLOB app_sources src/*.c)
-target_sources(app PRIVATE ${app_sources} drivers/uart/uart.c drivers/servo/servo.c drivers/stepper/stepper.c)
+target_sources(app PRIVATE ${app_sources} drivers/uart/uart.c drivers/servo/servo.c drivers/stepper/stepper.c drivers/rtc/rtc.c)

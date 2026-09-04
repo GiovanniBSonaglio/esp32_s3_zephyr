@@ -1,9 +1,11 @@
 #include <zephyr/kernel.h>
+#include <zephyr/drivers/rtc.h>
 #include <zephyr/logging/log.h>
 
 #include "uart.h"
 #include "servo.h"
 #include "stepper.h"
+#include "rtc.h"
 #include "usbd_configurator.h"
 
 LOG_MODULE_REGISTER(esp32_app_module, CONFIG_LOG_DEFAULT_LEVEL);
@@ -23,13 +25,19 @@ int main(void)
     
     ret = init_cdc_acm(&usbd_ctx);
 	if (ret != 0) {
-        LOG_ERR("Failed to enable USB CDC ACM device support");
+        LOG_ERR("Error initializing USB CDC ACM device support");
 		return ret;
 	}
 
     ret = init_stepper();
 	if (ret != 0) {
-        LOG_ERR("Failed to initialize Stepper");
+        LOG_ERR("Error initializing stepper motor");
+		return ret;
+	}
+
+    ret = init_rtc();
+    if (ret != 0) {
+        LOG_ERR("Error initializing RTC");
 		return ret;
 	}
     
@@ -37,7 +45,6 @@ int main(void)
     
     ret = set_servo_deg_pos(10);
     ret = stepper_move_by_deg(10);
-
 
     return 0;
 }
